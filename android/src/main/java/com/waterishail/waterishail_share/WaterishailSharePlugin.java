@@ -34,18 +34,42 @@ public class WaterishailSharePlugin implements MethodCallHandler,PluginRegistry.
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
-    if(call.method.equals("share")){
-      title = call.argument("title");
-      url = call.argument("url");
-      imageUrl = call.argument("image");
-      share(title, imageUrl, result);
+    if(call.method.equals("share_image")){
+      shareImage(call, result);
+    } else if (call.method.equals("share_text")) {
+      shareText(call, result);
     } else {
       result.notImplemented();
     }
   }
 
+  private void shareImage(MethodCall call, Result result) {
+    String text = call.argument("text");
+    String imageFile = call.argument("imageFile");
+
+    if (imageFile == null || imageFile.isEmpty()) {
+      result.error("MISSING_IMAGEPATH_PARAM", "The image path parameter is missing", null);
+      return;
+    }
+
+    share(text, imageFile, result);
+  }
+
+  private void shareText(MethodCall call, Result result) {
+    String text = call.argument("text");
+
+    if (text == null || text.isEmpty()) {
+      result.error("MISSING_TEXT_PARAM", "The text parameter is required", null);
+      return;
+    }
+
+    share(text, null, result);
+  }
+
 
   private void share(String text,String fileURI, Result result) {
+
+
     Intent shareIntent;
 
     if (fileURI != null) {

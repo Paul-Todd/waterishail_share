@@ -11,71 +11,77 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if([@"share_image" isEqualToString:call.method]) {
+    if([@"share_image" isEqualToString:call.method]) {
         [self shareImage:call.arguments result: result];
-  } else if ([@"share_text" isEqualToString:call.method]) {
+    } else if ([@"share_text" isEqualToString:call.method]) {
         [self shareText:call.arguments result: result];
-  } else {
-    result(FlutterMethodNotImplemented);
-  }
+    } else {
+        result(FlutterMethodNotImplemented);
+    }
 }
 
 - (void)shareText:(NSDictionary *)params result:(FlutterResult) result {
-    if(params == nil) {
-      return;
+    NSString* text = params[@"text"];
+    if (!text || text.length == 0) {
+        result([FlutterError
+               errorWithCode:@"MISSING_TEXT_PARAM"
+               message:@"The text parameter is required"
+               details:nil]);
+        return;
     }
-
-    NSString *text = params[@"text"];
+    
     NSMutableArray *activityItems = [NSMutableArray new];
-    if (text) {
-        [activityItems addObject:text];
-    }
+    [activityItems addObject:text];
 
      [self share:activityItems result: result];
 }
 
 - (void)shareImage:(NSDictionary *)params result:(FlutterResult) result {
-    if(params == nil) {
-      return;
-    }
+    NSString* text = params[@"text"];
     NSString *imagePath = params[@"imageFile"];
-    NSString *text = params[@"text"];
+    
+    if (!imagePath || imagePath.length == 0) {
+        result([FlutterError
+              errorWithCode:@"MISSING_IMAGEPATH_PARAM"
+              message:@"The image path parameter is missing"
+              details:nil]);
+        return;
+    }
 
     NSMutableArray *activityItems = [NSMutableArray new];
-    if (text) {
-        [activityItems addObject:text];
-    }
-
+    
     UIImage *image = nil;
-    if (imagePath) {
-        NSURL *imageUrl = [NSURL URLWithString:imagePath];
-        if (TARGET_IPHONE_SIMULATOR) {
-            if (imageUrl.scheme) {
-                NSError *error;
-                NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
-                if (data) {
-                    image = [UIImage imageWithData:data];
-                }
-            } else {
-                image = [UIImage imageWithContentsOfFile:imagePath];
-            }
 
-        } else {
-            if ([imageUrl.scheme isEqualToString:@"file"]) {
-                image = [UIImage imageWithContentsOfFile:imagePath];
-            } else {
-                NSError *error;
-                NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
-                if (data) {
-                    image = [UIImage imageWithData:data];
-                }
+    NSURL *imageUrl = [NSURL URLWithString:imagePath];
+    if (TARGET_IPHONE_SIMULATOR) {
+        if (imageUrl.scheme) {
+            NSError *error;
+            NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
+            if (data) {
+                image = [UIImage imageWithData:data];
             }
+        } else {
+            image = [UIImage imageWithContentsOfFile:imagePath];
         }
 
+    } else {
+        if ([imageUrl.scheme isEqualToString:@"file"]) {
+            image = [UIImage imageWithContentsOfFile:imagePath];
+        } else {
+            NSError *error;
+            NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
+            if (data) {
+                image = [UIImage imageWithData:data];
+            }
+        }
     }
 
     if (image) {
         [activityItems addObject:image];
+    }
+
+    if (text) {
+        [activityItems addObject:text];
     }
 
     [self share:activityItems result: result];
