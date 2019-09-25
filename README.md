@@ -51,3 +51,4 @@ Here we tell the content provider we want to allow sharing of the file in the ap
 ## Useful links
 (Using the share api in iOS)[https://pinkstone.co.uk/how-to-share-things-with-a-uiactivityviewcontroller/]
 (Using the share api in Android)[https://medium.com/androiddevelopers/sharing-content-between-android-apps-2e6db9d1368b]
+(Handling results)[https://developer.android.com/training/sharing/send]

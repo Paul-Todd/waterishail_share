@@ -8,7 +8,7 @@ class WaterishailShare {
   static const MethodChannel _channel = const MethodChannel('waterishail_share');
 
   static Future<int> shareImage({@required File imageFile, String text}) async {
-    Map<String, dynamic> params = {"imageFile": imageFile.uri.path.toString()};
+    Map<String, dynamic> params = {"imageFile": imageFile.absolute.uri.toString()};
 
     if (text != null && text.isNotEmpty) {
       params["text"] = text;

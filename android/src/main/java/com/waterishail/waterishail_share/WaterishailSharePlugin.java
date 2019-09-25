@@ -10,15 +10,21 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.PluginRegistry;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
 
 import java.io.*;
 import java.net.URI;
 
+
 /** NativeSharePlugin */
-public class WaterishailSharePlugin implements MethodCallHandler,PluginRegistry.ActivityResultListener {
+public class WaterishailSharePlugin implements MethodCallHandler {
+  Result result;
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "waterishail_share");
@@ -26,14 +32,14 @@ public class WaterishailSharePlugin implements MethodCallHandler,PluginRegistry.
   }
 
   private final Registrar registrar;
-  private String title,url,imageUrl;
   private WaterishailSharePlugin(Registrar registrar) {
     this.registrar = registrar;
-    registrar.addActivityResultListener(this);
   }
 
   @Override
-  public void onMethodCall(MethodCall call, Result result) {
+  public void onMethodCall(MethodCall call, Result res) {
+    result = res;
+
     if(call.method.equals("share_image")){
       shareImage(call, result);
     } else if (call.method.equals("share_text")) {
@@ -99,18 +105,21 @@ public class WaterishailSharePlugin implements MethodCallHandler,PluginRegistry.
               .getIntent();
     }
 
-//    shareIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//    shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    String SHARED_INTENT_NAME ="FLUTTER_SHARE";
+    PendingIntent pi = PendingIntent.getBroadcast(registrar.context(), 0, new Intent(SHARED_INTENT_NAME),0);
 
-    Intent intent = Intent.createChooser(shareIntent, null);
+    registrar.context().registerReceiver(new BroadcastReceiver()
+    {
+      @Override
+      public void onReceive(Context arg0, Intent arg1)
+      {
+        Log.d("ZZZZZZZZZ", "Receiver was called");
+      }
+    }, new IntentFilter(SHARED_INTENT_NAME));
 
-    if (shareIntent.resolveActivity(registrar.context().getPackageManager()) != null) {
-      registrar.activity().startActivity(intent);
-    }
+    Intent chooserIntent = Intent.createChooser(shareIntent, null, pi.getIntentSender());
+
+    registrar.activity().startActivity(chooserIntent);
   }
 
-  public
-  boolean onActivityResult(int var1, int var2, Intent var3) {
-    return true;
-  }
 }
