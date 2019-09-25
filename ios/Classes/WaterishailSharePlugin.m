@@ -53,35 +53,22 @@
     UIImage *image = nil;
 
     NSURL *imageUrl = [NSURL URLWithString:imagePath];
-    if (TARGET_IPHONE_SIMULATOR) {
-        if (imageUrl.scheme) {
-            NSError *error;
-            NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
-            if (data) {
-                image = [UIImage imageWithData:data];
-            }
-        } else {
-            image = [UIImage imageWithContentsOfFile:imagePath];
+    if (imageUrl.scheme) {
+        NSError *error;
+        NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
+        if (data) {
+            image = [UIImage imageWithData:data];
         }
-
     } else {
-        if ([imageUrl.scheme isEqualToString:@"file"]) {
-            image = [UIImage imageWithContentsOfFile:imagePath];
-        } else {
-            NSError *error;
-            NSData *data = [NSData dataWithContentsOfURL:imageUrl options:NSDataReadingMappedIfSafe error:&error];
-            if (data) {
-                image = [UIImage imageWithData:data];
-            }
-        }
-    }
-
-    if (image) {
-        [activityItems addObject:image];
+        image = [UIImage imageWithContentsOfFile:imagePath];
     }
 
     if (text) {
         [activityItems addObject:text];
+    }
+
+    if (image) {
+        [activityItems addObject:image];
     }
 
     [self share:activityItems result: result];
