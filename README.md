@@ -1,6 +1,8 @@
 # waterishail_share
 
-Share plugin for iOS and Android
+Share plugin for iOS and Android. 
+
+**This is a WORK IN PROGRESS**
 
 ## Getting Started
 
