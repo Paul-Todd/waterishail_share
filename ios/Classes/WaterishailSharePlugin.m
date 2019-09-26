@@ -1,6 +1,7 @@
 #import "WaterishailSharePlugin.h"
 #import "PLSaveImageActivity.h"
 
+
 @implementation WaterishailSharePlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
@@ -67,11 +68,17 @@
         [activityItems addObject:text];
     }
 
+    if (!image) {
+        image = [UIImage imageNamed:@"AppIcon"];
+    }
+
     if (image) {
         [activityItems addObject:image];
     }
 
-    [self share:activityItems result: result];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self share:activityItems result: result];
+    });
 }
 
 
@@ -79,9 +86,10 @@
 
     PLSaveImageActivity *saveImageActivity = [PLSaveImageActivity new];
     UIActivityViewController *activityViewController =
-    [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:@[saveImageActivity]];
+    [[UIActivityViewController alloc] initWithActivityItems:activityItems
+                                      applicationActivities: nil];
 
-    activityViewController.excludedActivityTypes = @[UIActivityTypeSaveToCameraRoll];
+    //activityViewController.excludedActivityTypes = @[UIActivityTypeSaveToCameraRoll];
     UIViewController *controller = [UIApplication sharedApplication].keyWindow.rootViewController;
     activityViewController.popoverPresentationController.sourceView = controller.view;
 
