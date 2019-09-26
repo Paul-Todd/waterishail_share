@@ -16,11 +16,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.*;
 import java.net.URI;
 
+static String SHARED_INTENT_NAME ="FLUTTER_SHARE";
 
 /** NativeSharePlugin */
 public class WaterishailSharePlugin implements MethodCallHandler {
@@ -81,14 +81,10 @@ public class WaterishailSharePlugin implements MethodCallHandler {
     if (fileURI != null) {
       URI uri = URI.create(fileURI);
 
-      Log.d("XXXXXXX", "File: " + fileURI);
-
       File imageFile = new File(uri);
       String authority = registrar.context().getPackageName();
-      Log.d("XXXXXXX", "Authority: " + authority);
 
       Uri uriToImage = FileProvider.getUriForFile(registrar.context(), authority, imageFile);
-      Log.d("XXXXXX", "URI: " + uriToImage.toString());
 
       shareIntent = ShareCompat.IntentBuilder
               .from(registrar.activity())
@@ -105,7 +101,6 @@ public class WaterishailSharePlugin implements MethodCallHandler {
               .getIntent();
     }
 
-    String SHARED_INTENT_NAME ="FLUTTER_SHARE";
     PendingIntent pi = PendingIntent.getBroadcast(registrar.context(), 0, new Intent(SHARED_INTENT_NAME),0);
 
     registrar.context().registerReceiver(new BroadcastReceiver()
@@ -113,7 +108,6 @@ public class WaterishailSharePlugin implements MethodCallHandler {
       @Override
       public void onReceive(Context arg0, Intent arg1)
       {
-        Log.d("ZZZZZZZZZ", "Receiver was called");
       }
     }, new IntentFilter(SHARED_INTENT_NAME));
 
