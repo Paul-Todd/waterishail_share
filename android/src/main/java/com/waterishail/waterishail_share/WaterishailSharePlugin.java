@@ -20,10 +20,11 @@ import android.net.Uri;
 import java.io.*;
 import java.net.URI;
 
-static String SHARED_INTENT_NAME ="FLUTTER_SHARE";
 
 /** NativeSharePlugin */
 public class WaterishailSharePlugin implements MethodCallHandler {
+  private static final String SHARED_INTENT_NAME = "FLUTTER_SHARE";
+
   Result result;
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
