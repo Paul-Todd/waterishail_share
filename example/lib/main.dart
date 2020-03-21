@@ -18,7 +18,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  void onShareImage() async {
+  void onShareImage(Rect rect) async {
     print("Reading logo from assets");
     final byteData = await rootBundle.load('assets/flutter-logo.png');
 
@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
 
     print("Sharing image");
-    await WaterishailShare.shareImage(imageFile: file, text: "This is a file");
+    await WaterishailShare.shareImage(imageFile: file, text: "This is a file", sharePositionOrigin: rect);
 
     print("Deleting file");
     await file.delete();
@@ -55,10 +55,16 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              RaisedButton(
-                child: Text("Share Image"),
-                onPressed: () {
-                  onShareImage();
+              Builder(
+                builder: (BuildContext context) {
+                  return RaisedButton(
+                    child: Text("Share Image"),
+                    onPressed: () {
+                      final RenderBox box = context.findRenderObject();
+                      final Rect r = box.localToGlobal(Offset.zero) & box.size;
+                      onShareImage(r);
+                    },
+                  );
                 },
               ),
               RaisedButton(

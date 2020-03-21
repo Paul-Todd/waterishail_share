@@ -34,7 +34,18 @@
     NSMutableArray *activityItems = [NSMutableArray new];
     [activityItems addObject:text];
 
-     [self share:activityItems result: result];
+    NSNumber *originX = params[@"originX"];
+    NSNumber *originY = params[@"originY"];
+    NSNumber *originWidth = params[@"originWidth"];
+    NSNumber *originHeight = params[@"originHeight"];
+
+    CGRect originRect = CGRectZero;
+    if (originX != nil && originY != nil && originWidth != nil && originHeight != nil) {
+    originRect = CGRectMake([originX doubleValue], [originY doubleValue],
+                            [originWidth doubleValue], [originHeight doubleValue]);
+    }
+
+    [self share:activityItems :originRect result: result];
 }
 
 - (void)shareImage:(NSDictionary *)params result:(FlutterResult) result {
@@ -76,15 +87,26 @@
         [activityItems addObject:image];
     }
 
+    NSNumber *originX = params[@"originX"];
+    NSNumber *originY = params[@"originY"];
+    NSNumber *originWidth = params[@"originWidth"];
+    NSNumber *originHeight = params[@"originHeight"];
+    
+    CGRect originRect = CGRectZero;
+    if (originX != nil && originY != nil && originWidth != nil && originHeight != nil) {
+        originRect = CGRectMake([originX doubleValue], [originY doubleValue],
+                                [originWidth doubleValue], [originHeight doubleValue]);
+    }
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self share:activityItems result: result];
+        [self share:activityItems :originRect result: result];
     });
 }
 
 
-- (void)share:(NSArray *)activityItems result:(FlutterResult) result {
+- (void)share:(NSArray *)activityItems :(CGRect) origin result:(FlutterResult) result {
 
-    PLSaveImageActivity *saveImageActivity = [PLSaveImageActivity new];
+    //PLSaveImageActivity *saveImageActivity = [PLSaveImageActivity new];
     UIActivityViewController *activityViewController =
     [[UIActivityViewController alloc] initWithActivityItems:activityItems
                                       applicationActivities: nil];
@@ -111,6 +133,18 @@
         }
     };
 
+//    [controller presentViewController:activityViewController animated:YES completion:nil];
+
+   //if iPhone
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        // Change Rect to position Popover
+        if (CGRectIsEmpty(origin)) {
+            NSLog(@"Rect is empty - using default");
+            origin = CGRectMake(controller.view.frame.size.width/2, controller.view.frame.size.height/4, 0, 0);
+        }
+        activityViewController.popoverPresentationController.sourceRect = origin;
+    }
+    
     [controller presentViewController:activityViewController animated:YES completion:nil];
 }
 
